@@ -1,13 +1,33 @@
+<p align="center">
+  <img src="docs/screenshots/icon.svg" alt="Musical Marbles icon" width="96" height="96">
+</p>
+
 # Musical Marbles
 
 A browser-based audiovisual playground and video studio: marbles, machines and music.
 
-- **Playground** — free physics where real contacts make the sound: a builder sandbox with
+![Melody Rain playing Für Elise, with the control panel open](docs/screenshots/melody-rain.jpg)
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Canon Contraption performing Pachelbel's Canon in D](docs/screenshots/canon-contraption.jpg) | ![Geometric Sequencer with the panel hidden](docs/screenshots/geometric-sequencer.jpg) |
+| **Canon Contraption** (Performance) | **Geometric Sequencer** (Playground) |
+| ![Builder Sandbox with the Chime staircase preset](docs/screenshots/builder-sandbox.jpg) | |
+| **Builder Sandbox** (Playground) | |
+
+Captured from `npm run dev` in headless Chromium with the built-in demo scenes and songs. The app
+has a single dark look, so there are no light-mode shots.
+
+## What's inside
+
+- **Playground**: free physics where real contacts make the sound: a builder sandbox with
   ramps, walls, bumpers, funnels, musical pads and note gates; a growing ball; a collision
   cascade; a deterministic geometric sequencer; and a Shepard-tone illusion lab.
-- **Performance** — five families of kinetic machines that visibly perform short excerpts of
+- **Performance**: five families of kinetic machines that visibly perform short excerpts of
   public-domain classical pieces, every note struck by a mechanism at its score time.
-- **Studio** — record the canvas plus the generated audio to a video file at exact export
+- **Studio**: record the canvas plus the generated audio to a video file at exact export
   sizes, or save PNG screenshots.
 
 Everything runs locally in the browser: no backend, accounts, analytics, network audio,
@@ -15,16 +35,16 @@ microphone or camera. All sound is synthesised live with the Web Audio API.
 
 ---
 
-## Run it
+## Install
 
-**Live site:** https://harrisonfischberg.github.io/musical-marbles/ — every push to `main` is tested, built with Vite and published by `.github/workflows/pages.yml`.
+**Use it in the browser:** https://harrisonfischberg.github.io/musical-marbles/ (every push to `main` is tested, built with Vite and published by `.github/workflows/pages.yml`).
 
-Requires Node.js **22.18 or newer** (the build scripts are TypeScript run directly by Node).
+There is nothing to install for that. To run it yourself you need Node.js **22.18 or newer**
+(the build scripts are TypeScript run directly by Node) and a browser with WebGL.
 
-### Get it on your computer
+### Run it locally
 
 ```bash
-cd ~/projects
 git clone https://github.com/HarrisonFischberg/musical-marbles.git
 cd musical-marbles
 npm install
@@ -65,6 +85,15 @@ Other scripts: `node scripts/build-scores.ts` regenerates `public/scores/*.json`
 sources; `node scripts/inspect-midi.ts <file.mid> [track]` prints a MIDI summary;
 `node scripts/browser-check.ts` runs the headless-browser checks (needs the `playwright`
 package and a Chromium build, not project dependencies).
+
+---
+
+## Dark mode
+
+Musical Marbles is dark only. The page declares `color-scheme: dark`, the interface uses a
+fixed night palette, and it does not follow your system's light or dark setting. You can change
+the look of the canvas under **Appearance → Palette** (Neon night, Aurora, Ember, Ice, Ink on
+night); every palette is dark.
 
 ---
 
@@ -284,7 +313,7 @@ Third-party code: three.js r186 and its type definitions (MIT, vendored in `vend
 
 ## Testing & verification
 
-- `npm test` — 95 Node tests: score validation (incl. hostile input), recognisable openings,
+- `npm test` — 105 Node tests: score validation (incl. hostile input), recognisable openings,
   timing/grouping/tempo ramp, every performance family × supported song × tempo 1.0 and 0.8
   (1:1 note↔activation mapping, visible target for every activation, no teleports, bounded
   speed, contact on time, physically valid bounces, ring gap clearance, door timing), physics
@@ -312,3 +341,8 @@ Third-party code: three.js r186 and its type definitions (MIT, vendored in `vend
   physics simulations; the Playground scenes (and Orbital Classics' Sandbox mode) are the
   free-physics part.
 - Very fast passages are excluded from some scenes rather than shown implausibly (see the Song menu).
+
+---
+
+Made by [Rare Creatures LLC](https://rarecreatures.app). Questions or feedback:
+[hello@rarecreatures.app](mailto:hello@rarecreatures.app).
