@@ -103,6 +103,8 @@ export class App {
     window.addEventListener('keydown', (e) => this.keydown(e));
     document.addEventListener('visibilitychange', () => this.visibility());
     window.addEventListener('beforeunload', () => {
+      // parts drawn in the Builder reach the settings only here or on the next control change
+      if (this.scene) this.saveSceneValues();
       saveSettings(this.settings);
       this.recorder.dispose();
     });
