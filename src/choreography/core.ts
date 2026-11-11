@@ -197,13 +197,6 @@ export function flightVelAt(s: Extract<Segment, { kind: 'flight' }>, t: number):
   return { x: s.vx, y: s.vy - s.g * (t - s.t0) };
 }
 
-/** Apex height above the start of a flight segment (for reachability checks). */
-export function flightApex(s: Extract<Segment, { kind: 'flight' }>): number {
-  if (s.vy <= 0) return s.y0;
-  const ta = Math.min(s.vy / s.g, s.t1 - s.t0);
-  return s.y0 + s.vy * ta - 0.5 * s.g * ta * ta;
-}
-
 export interface Activation {
   time: number;
   /** prop that visibly produces the sound */

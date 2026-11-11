@@ -161,7 +161,3 @@ export function groupSimultaneous(notes: TimedNote[], epsilon = 0.012): NoteGrou
 export function scoreDurationSeconds(score: ScoreData, tempoScale = 1): number {
   return beatToSeconds(score.durationBeats, score, tempoScale);
 }
-
-export function notesByVoice(notes: TimedNote[], voice: VoiceRole): TimedNote[] {
-  return notes.filter((n) => n.voice === voice);
-}
