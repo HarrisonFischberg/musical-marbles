@@ -825,6 +825,7 @@ export class App {
   }
 
   private importScore(text: string, msg: HTMLElement): void {
+    if (this.recorder.recording) return this.notify('Stop recording first.', 'warn');
     let raw: unknown;
     try {
       raw = JSON.parse(text);
