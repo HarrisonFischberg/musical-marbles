@@ -87,6 +87,8 @@ export function validateScore(raw: unknown): string[] {
   const src = s.source as Record<string, unknown> | undefined;
   if (!src || typeof src !== 'object') errs.push('source is required (collection, edition, license, note).');
   else for (const k of ['collection', 'edition', 'license', 'note']) if (typeof src[k] !== 'string') errs.push(`source.${k} must be a string.`);
+  // the url becomes a clickable link: only web addresses (never javascript: or data:)
+  if (src && src.url !== undefined && !(typeof src.url === 'string' && /^https?:\/\//i.test(src.url))) errs.push('source.url must start with http:// or https://.');
   const tempo = s.tempo as Record<string, unknown> | undefined;
   if (!tempo || typeof tempo.bpm !== 'number' || !(tempo.bpm >= 20 && tempo.bpm <= 300)) errs.push('tempo.bpm must be a number between 20 and 300.');
   if (tempo && tempo.rampTo !== undefined && !(typeof tempo.rampTo === 'number' && tempo.rampTo >= 0.5 && tempo.rampTo <= 2)) errs.push('tempo.rampTo must be between 0.5 and 2.');

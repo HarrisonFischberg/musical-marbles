@@ -44,6 +44,9 @@ test('validator rejects malformed or hostile input', () => {
   assert.ok(errs.some((e) => e.includes('.voice')));
   const unsorted = { ...s, notes: [s.notes[5], s.notes[0]] };
   assert.ok(validateScore(unsorted).some((e) => e.includes('out of order')));
+  const src = (s as unknown as { source: object }).source;
+  assert.ok(validateScore({ ...s, source: { ...src, url: 'javascript:alert(1)' } }).some((e) => e.includes('source.url')));
+  assert.deepEqual(validateScore({ ...s, source: { ...src, url: undefined } }), []);
   const proto = JSON.parse('{"__proto__": {"polluted": true}, "schema": "musical-marbles/score@1"}');
   validateScore(proto);
   assert.equal(({} as Record<string, unknown>).polluted, undefined);
