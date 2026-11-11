@@ -127,7 +127,7 @@ export class ShepardLabScene implements Scene {
     }
     if (this.values.pings === true) {
       // ping tuned to the current pitch class of the illusion
-      const pc = (this.phase.phase * 12 + (this.settings.mode === 'stepped' ? 0 : 0)) % 12;
+      const pc = (this.phase.phase * 12) % 12;
       const pitch = 72 + Math.round(pc);
       this.host.playNote('glass', pitch, clamp(0.2 + e.speed / 30, 0.15, 0.45), e.x, 0.6);
     }
@@ -179,11 +179,11 @@ export class ShepardLabScene implements Scene {
       dl.ring(0, 0, r, 0.025 + l.amp * s.layers * 0.03, c, clamp(l.amp * s.layers * 0.5, 0.05, 0.9), 0.05 + l.amp * 0.6, 'trail');
     }
     // endless staircase: 12 steps whose radius climbs around the circle; the whole ring turns with the phase
-    const rot = -this.phase.total * TAU * (s.direction > 0 ? 1 : 1);
+    const rot = -this.phase.total * TAU;
     for (let k = 0; k < 12; k++) {
       const a0 = rot + (k / 12) * TAU;
       const a1 = a0 + TAU / 12 - 0.04;
-      const r = this.R - 0.05 + (k / 12) * 0.0;
+      const r = this.R - 0.05;
       const height = k / 11;
       const c = hsl(pal.hue + height * 0.6, 0.85, 0.45 + height * 0.25);
       dl.arc(0, 0, r, 0.09 + height * 0.06, a0, a1 - a0, c, 0.95, 0.1 + this.stepFlash * 0.2);

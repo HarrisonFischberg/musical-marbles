@@ -67,7 +67,3 @@ export function allScores(): ScoreData[] {
   };
   return [...cache.values()].sort((a, b) => order(a.id) - order(b.id));
 }
-
-export function songLabel(s: ScoreData): string {
-  return `${s.title} — ${s.composer.split(' ').slice(-1)[0]}`;
-}

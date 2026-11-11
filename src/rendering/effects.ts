@@ -77,10 +77,6 @@ export class Particles {
     for (const p of this.items) this.free.push(p);
     this.items.length = 0;
   }
-
-  get count(): number {
-    return this.items.length;
-  }
 }
 
 const TRAIL_POINTS = 48;

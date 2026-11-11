@@ -134,12 +134,6 @@ export class World {
     return c;
   }
 
-  removeCollider(c: Collider): void {
-    const i = this.colliders.indexOf(c);
-    if (i >= 0) this.colliders.splice(i, 1);
-    for (const b of this.balls) b.touching.delete(c.id);
-  }
-
   clearColliders(): void {
     this.colliders.length = 0;
   }

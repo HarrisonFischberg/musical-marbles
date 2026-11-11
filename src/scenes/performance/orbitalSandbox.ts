@@ -64,8 +64,14 @@ export class OrbitalSandbox {
 
   private spawn(i: number): void {
     const above = i % 2 === 0;
-    const x = this.rng.range(-3, 3);
-    const y = (above ? 1 : -1) * this.rng.range(1.5, 4);
+    // a taken spot must not cost a marble for good: try a few places (bounded)
+    let x = 0;
+    let y = 0;
+    for (let k = 0; k < 8; k++) {
+      x = this.rng.range(-3, 3);
+      y = (above ? 1 : -1) * this.rng.range(1.5, 4);
+      if (this.host.world.isFree(x, y, 0.3)) break;
+    }
     const a = this.rng.range(0, TAU);
     if (!this.host.world.isFree(x, y, 0.3)) return;
     const b = this.host.world.addBall(x, y, 0.22, Math.cos(a) * this.speed, Math.sin(a) * this.speed, i / 3);

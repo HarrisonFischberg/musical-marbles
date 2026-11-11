@@ -48,7 +48,6 @@ export class AudioEngine {
   private mechLevel = 0.35;
   /** extra input for engines that synthesise continuously (Shepard lab) */
   input!: GainNode;
-  voicesStolen = 0;
 
   get running(): boolean {
     return !!this.ctx && this.ctx.state === 'running';
@@ -67,10 +66,6 @@ export class AudioEngine {
       this.buildGraph(ctx);
     }
     if (this.ctx.state !== 'running') await this.ctx.resume();
-  }
-
-  async suspend(): Promise<void> {
-    if (this.ctx && this.ctx.state === 'running') await this.ctx.suspend();
   }
 
   now(): number {
@@ -170,7 +165,6 @@ export class AudioEngine {
       let oldest = this.voices[0];
       for (const v of this.voices) if (v.start < oldest.start) oldest = v;
       oldest.cancel();
-      this.voicesStolen++;
       this.reap(now);
     }
     const pan = ctx.createStereoPanner();
@@ -323,18 +317,10 @@ export class AudioEngine {
     if (this.ctx) this.master.gain.setTargetAtTime(this.masterLevel, this.ctx.currentTime, 0.03);
   }
 
-  get masterVolume(): number {
-    return this.masterLevel;
-  }
-
   /** Mutes the speakers only — recordings still capture the mix. */
   setMuted(m: boolean): void {
     this.muted = m;
     if (this.ctx) this.speakerGain.gain.setTargetAtTime(m ? 0 : 1, this.ctx.currentTime, 0.02);
-  }
-
-  get isMuted(): boolean {
-    return this.muted;
   }
 
   setInstrumentVolume(id: InstrumentId, v: number): void {
@@ -343,26 +329,14 @@ export class AudioEngine {
     if (g && this.ctx) g.gain.setTargetAtTime(v, this.ctx.currentTime, 0.03);
   }
 
-  instrumentVolume(id: InstrumentId): number {
-    return this.busLevels.get(id) ?? 0.8;
-  }
-
   setAmbience(on: boolean): void {
     this.ambience = on;
     if (this.ctx) this.reverbSend.gain.setTargetAtTime(on ? 0.22 : 0, this.ctx.currentTime, 0.05);
   }
 
-  get ambienceOn(): boolean {
-    return this.ambience;
-  }
-
   setMechVolume(v: number): void {
     this.mechLevel = v;
     if (this.ctx) this.mechBus.gain.setTargetAtTime(v, this.ctx.currentTime, 0.03);
-  }
-
-  get mechVolume(): number {
-    return this.mechLevel;
   }
 
   /** Audio for recordings (a live stream of the final mix), or null if unsupported. */

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadScores, rawScore } from './helpers.ts';
-import { beatToSeconds, groupSimultaneous, timeNotes, validateScore, scoreDurationSeconds } from '../src/music/score.ts';
+import { beatToSeconds, groupSimultaneous, timeNotes, validateScore, scoreDurationSeconds, type ScoreData } from '../src/music/score.ts';
 import { SONG_IDS } from '../src/music/library.ts';
 
 test('every bundled score validates and is 30–90 s at its default tempo', () => {
@@ -44,6 +44,15 @@ test('validator rejects malformed or hostile input', () => {
   assert.ok(errs.some((e) => e.includes('.voice')));
   const unsorted = { ...s, notes: [s.notes[5], s.notes[0]] };
   assert.ok(validateScore(unsorted).some((e) => e.includes('out of order')));
+  const src = (s as unknown as { source: object }).source;
+  assert.ok(validateScore({ ...s, source: { ...src, url: 'javascript:alert(1)' } }).some((e) => e.includes('source.url')));
+  assert.deepEqual(validateScore({ ...s, source: { ...src, url: undefined } }), []);
+  assert.ok(validateScore({ ...s, phrases: [null] }).some((e) => e.includes('phrases')));
+  assert.ok(validateScore({ ...s, catalog: undefined }).some((e) => e.includes('catalog')));
+  assert.ok(validateScore({ ...s, pickupBeats: undefined }).some((e) => e.includes('pickupBeats')));
+  const slow = { ...s, durationBeats: 16, tempo: { bpm: 100, beatUnit: 'quarter', rampTo: 0.5 }, notes: [{ t: 14, d: 20, p: 60, v: 0.5, voice: 'melody' }] };
+  assert.ok(validateScore(slow).some((e) => e.includes('tempo ramp')));
+  assert.ok(timeNotes(slow as unknown as ScoreData, 1, 0).some((n) => Number.isNaN(n.dur)), 'the rejected case really is NaN');
   const proto = JSON.parse('{"__proto__": {"polluted": true}, "schema": "musical-marbles/score@1"}');
   validateScore(proto);
   assert.equal(({} as Record<string, unknown>).polluted, undefined);
