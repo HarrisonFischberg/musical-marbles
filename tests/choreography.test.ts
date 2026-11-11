@@ -6,6 +6,9 @@ import { validateChoreography } from '../src/choreography/core.ts';
 import { Rng } from '../src/core/rng.ts';
 import { VOICINGS, type Family } from '../src/scenes/performance/perfScene.ts';
 import { FAMILIES } from '../src/scenes/performance/families.ts';
+import { OrbitalSandbox } from '../src/scenes/performance/orbitalSandbox.ts';
+import { getPalette } from '../src/rendering/palette.ts';
+import type { SceneServices } from '../src/scenes/types.ts';
 
 const scores = registerAll();
 
@@ -69,4 +72,19 @@ test('maze: every timed door is open whenever a marble is at it', async () => {
     }
     assert.ok(checked > 0, 'marbles actually pass through doors');
   }
+});
+
+test('orbital sandbox keeps its three marbles over a long session', () => {
+  const noop = () => {};
+  const svc = { audio: { play: noop, mech: noop }, particles: { burst: noop }, palette: () => getPalette('neon') } as unknown as SceneServices;
+  const sb = new OrbitalSandbox(scores.find((s) => s.id === 'prelude-c-major')!, VOICINGS.classic.v, svc, 2);
+  const marbles = () => Number(sb.stats().find(([k]) => k === 'Marbles')![1]);
+  for (let i = 0; i < 10 * 60 * 60; i++) sb.update(1 / 60);
+  // a marble that just popped is replaced 0.8 s later, so look at the best count over a few seconds
+  let best = 0;
+  for (let i = 0; i < 5 * 60; i++) {
+    sb.update(1 / 60);
+    best = Math.max(best, marbles());
+  }
+  assert.equal(best, 3);
 });
