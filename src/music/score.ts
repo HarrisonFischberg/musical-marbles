@@ -80,7 +80,7 @@ export function validateScore(raw: unknown): string[] {
   if (!raw || typeof raw !== 'object') return ['Score must be a JSON object.'];
   const s = raw as Record<string, unknown>;
   if (!schemaIs(s.schema, 'score')) errs.push('schema must be "musical-marbles/score@1".');
-  for (const k of ['id', 'composer', 'title', 'work', 'movement', 'excerpt']) {
+  for (const k of ['id', 'composer', 'title', 'work', 'catalog', 'movement', 'excerpt']) {
     if (typeof s[k] !== 'string' || !(s[k] as string).length || (s[k] as string).length > 300) errs.push(`${k} must be a non-empty string (≤300 chars).`);
   }
   if (typeof s.id === 'string' && !/^[a-z0-9-]{1,64}$/.test(s.id)) errs.push('id may only contain a-z, 0-9 and "-".');
@@ -95,7 +95,8 @@ export function validateScore(raw: unknown): string[] {
   const meter = s.meter as Record<string, unknown> | undefined;
   if (!meter || !Number.isInteger(meter.numerator) || !Number.isInteger(meter.denominator) || (meter.numerator as number) < 1 || (meter.numerator as number) > 16 || ![2, 4, 8, 16].includes(meter.denominator as number)) errs.push('meter must have integer numerator 1–16 and denominator 2/4/8/16.');
   if (typeof s.durationBeats !== 'number' || !(s.durationBeats > 0 && s.durationBeats < 2000)) errs.push('durationBeats must be a positive number.');
-  if (!Array.isArray(s.phrases)) errs.push('phrases must be an array.');
+  if (typeof s.pickupBeats !== 'number' || !(s.pickupBeats >= 0 && s.pickupBeats <= 64)) errs.push('pickupBeats must be a number 0–64.');
+  if (!Array.isArray(s.phrases) || s.phrases.length > 200 || !s.phrases.every((p: unknown) => !!p && typeof p === 'object' && Number.isFinite((p as { t: unknown }).t) && typeof (p as { label: unknown }).label === 'string')) errs.push('phrases must be an array of { t: number, label: string }.');
   if (!Array.isArray(s.arrangement)) errs.push('arrangement must be an array of strings.');
   if (!Array.isArray(s.notes) || s.notes.length === 0) {
     errs.push('notes must be a non-empty array.');
@@ -117,6 +118,8 @@ export function validateScore(raw: unknown): string[] {
       if (typeof s.durationBeats === 'number' && o.t > s.durationBeats) errs.push(`notes[${i}] starts after durationBeats.`);
     }
     if (typeof o.d !== 'number' || !(o.d > 0 && o.d <= 64)) errs.push(`notes[${i}].d must be in (0, 64].`);
+    // a slowing tempo ramp reaches zero tempo at some beat; a note may not ring past it (its length would be NaN)
+    else if (tempo && typeof tempo.rampTo === 'number' && typeof o.t === 'number' && typeof s.durationBeats === 'number' && !(1 + ((tempo.rampTo - 1) * (o.t + o.d)) / s.durationBeats > 0)) errs.push(`notes[${i}] is too long for the tempo ramp.`);
     if (!Number.isInteger(o.p) || (o.p as number) < 21 || (o.p as number) > 108) errs.push(`notes[${i}].p must be an integer MIDI pitch 21–108.`);
     if (typeof o.v !== 'number' || !(o.v >= 0 && o.v <= 1)) errs.push(`notes[${i}].v must be in [0, 1].`);
     if (!VOICE_ROLES.includes(o.voice as VoiceRole)) errs.push(`notes[${i}].voice must be one of ${VOICE_ROLES.join(', ')}.`);
